@@ -1,0 +1,21 @@
+---
+- name: CONFIGURE ROUTER INTERFACE
+  hosts: ACSR1kv
+  gather_facts: false
+  connection: local
+
+  tasks:
+   - name: CONFIGURE INTERFACE DIALER2
+     ios_config:
+       lines:
+         - interface Dialer 2
+         - ip address 10.10.1.1 255.255.255.0
+         - encapsulation ppp
+         - dialer pool 2
+         - description OSPF interface
+     register: config
+
+   #- name: SAVE OUTPUT ./ios_configurations/
+    # copy:
+     #  content: "{{ config.stdout_lines[0] }}"
+      # dest: "ios_configurations/Config_int_{{ inventory_hostname }}.txt"
