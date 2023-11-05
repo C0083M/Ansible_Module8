@@ -1,0 +1,46 @@
+---
+
+- name: Configure Hostname
+
+  hosts: ACSR1kv
+
+  gather_facts: false
+
+  connection: local
+
+
+
+  tasks:
+
+    - name: SET HOSTNAME
+
+      ios_config:
+
+        lines:
+
+          #- configure terminal
+
+          - hostname ACSR1Kv
+
+
+
+    - name: Show Running Configuration
+
+      ios_command:
+
+        commands:
+
+          - show run
+
+      register: output
+
+
+
+    - name: Save Running Configuration
+
+      copy:
+
+        content: "{{ output.stdout[0] }}"
+
+        dest: "ios_configurations/Hostname_{{ inventory_hostname }}.txt"
+
