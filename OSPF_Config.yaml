@@ -1,0 +1,25 @@
+- name: OSPF CONFIGURATION
+  hosts: ACSR1kv
+  become: true
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: ENTERING OSPF CONFIG MODE
+      ios_command:
+        commands:
+          - conf t
+          - router ospf 1
+          - router-id 1.1.1.1
+          - network 10.10.1.0 0.0.0.255 area 0
+
+    - name: SAVE OUTPUT TO ./ios_configurations/
+      ios_command:
+        commands:
+          - show running-config
+      register: config
+
+    - name: Copy OSPF Configuration to File
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "ios_configurations/OSPF_{{ inventory_hostname }}.txt"
