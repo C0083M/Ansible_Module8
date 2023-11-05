@@ -1,0 +1,24 @@
+---
+- name: CONFIGURE DHCP
+  hosts: ACSR1kv
+  become: true
+  gather_facts: false
+  connection: local
+ 
+  tasks:
+   - name: CONFIGURE DHCP
+     ios_command:
+       commands:
+         - conf t
+         - ip dhcp excluded-address 10.10.1.5 10.10.1.20
+         - ip dhcp pool mod8
+         - network 10.10.1.0 255.255.255.0
+         - domain-name module8.com
+         - default-router 10.10.1.1
+       #timeout: 60
+     register: config
+ 
+   - name: SAVE OUTPUT TO ./ios_configurations/
+     copy:
+       content: "{{ config.stdout[0] }}"
+       dest: "ios_configurations/DHCP_CONF{{ inventory_hostname }}.txt"
