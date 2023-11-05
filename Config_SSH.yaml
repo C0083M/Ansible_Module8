@@ -1,0 +1,72 @@
+---
+
+- name: Configure SSH on CSR1kv
+
+  hosts: ACSR1kv
+
+  become: true
+
+  gather_facts: false
+
+  connection: local
+
+
+
+  vars:
+
+    ssh_password: cisco123!
+
+    backup_dir: backups
+
+
+
+  tasks:
+
+    - name: Generate RSA Key
+
+      ios_config:
+
+        commands:
+
+          - crypto key generate rsa modulus 1024
+
+      register: rsa_key_output
+
+
+
+    - name: Configure SSH on VTY Lines
+
+      ios_config:
+
+        lines:
+
+          - "line vty 0 15"
+
+          - "transport input ssh"
+
+          - "password {{ ssh_password }}"
+
+          - "login"
+
+
+
+    - name: Save Running Configuration to File
+
+      ios_command:
+
+        commands:
+
+          - show running-config
+
+      register: show_run_output
+
+
+
+    - name: Write Backup Configuration
+
+      copy:
+
+        content: "{{ rsa_key_output.stdout[0] }}"
+
+        dest: "ios_configurations/SSH_{{ inventory_hostname }}.txt"
+
